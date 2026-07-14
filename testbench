@@ -1,0 +1,86 @@
+module tb;
+
+    logic clk;
+    logic rst;
+
+    logic load_sr;
+    logic [7:0] load_value;
+
+    logic shift_sr;
+
+    logic serial_out;
+
+
+    // Instantiate DUT
+    ShiftRegister #(
+        .ROTATE_TO_RIGHT(1),
+        .N(8)
+    ) DUT (
+        .clk(clk),
+        .rst(rst),
+
+        .load_sr(load_sr),
+        .load_value(load_value),
+
+        .shift_sr(shift_sr),
+
+        .serial_out(serial_out)
+    );
+
+
+    // Clock generation: 10ns period
+    always #5 clk = ~clk;
+
+
+    initial begin
+
+        // Initial values
+        clk = 0;
+        rst = 0;
+        load_sr = 0;
+        shift_sr = 0;
+        load_value = 8'b0;
+
+
+        // Reset
+        #2;
+        rst = 1;
+
+        #10;
+        rst = 0;
+
+
+        // Load data
+        #10;
+        load_value = 8'b10110010;
+        load_sr = 1;
+
+        #10;
+        load_sr = 0;
+
+
+        // Shift 8 times
+        repeat(8) begin
+
+            #10;
+            shift_sr = 1;
+
+            #10;
+            shift_sr = 0;
+
+        end
+
+
+        #20;
+        $finish;
+
+    end 
+initial    begin :dumfile
+  $dumpfile("wave.vcd");
+  $dumpvars(0,tb);
+
+
+end 
+  
+
+endmodule
